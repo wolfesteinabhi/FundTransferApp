@@ -1,5 +1,5 @@
 declared-services:
-  dashDBTest:
+  FUNDTRANSFERAPPLICATION-DB:
     label: cloudantNoSQLDB
     plan: Entry
 applications:
