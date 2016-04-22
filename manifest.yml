@@ -1,0 +1,14 @@
+declared-services:
+  dashDBTest:
+    label: cloudantNoSQLDB
+    plan: Entry
+applications:
+- path: .
+  memory: 512M
+  instances: 1
+  domain: mybluemix.net
+  name: FUNDTRANSFERAPPLICATION
+  host: FUNDTRANSFERAPPLICATION
+  disk_quota: 1024M
+  services:
+  - FUNDTRANSFERAPPLICATION-DB

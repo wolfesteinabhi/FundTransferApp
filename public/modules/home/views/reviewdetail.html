@@ -1,0 +1,196 @@
+
+<div class="row usertxt">
+	<div class="container">
+		<div class="col-md-12 col-sm-12 col-xs-12 text-right">
+			<div class="userinfo">
+				Welcome <span class="username"> </span> <a href="#/login"
+					class="btn btn-default logout-btn">logout</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="clearfix"></div>
+<div class="row darkred">
+	<div class="container">
+		<div class="col-md-6 col-sm-6 col-xs-6">
+			<p>Global Funds Transfer New</p>
+		</div>
+		<div class="col-md-6 col-sm-6 col-xs-6 text-right">
+			<p class="usermsg">
+				<a>Your Message <span class="glyphicon glyphicon-envelope"></span></a><span
+					class="hidden-xs">|</span> <a class="hidden-xs">Print <span
+					class="glyphicon glyphicon-print"></span></a>
+			</p>
+		</div>
+	</div>
+</div>
+
+<!-- <div class="row gerybg">
+	<div class="container">
+		<div class="txt">
+			<p class="">HSBC Holdings plc is a British multinational banking and financial services company headquartered in London, United Kingdom. It is the world's second largest bank. </p>
+		</div>
+	</div>
+</div> -->
+
+<div class="row ">
+	<div class="container">
+		<div class="col-xs-12 col-sm-3 col-md-3 sidebar-offcanvas hidden-xs"
+			id="sidebar">
+			<div class="list-group">
+				<a class="list-group-item sideheader">Important Link</a> <a
+					class="list-group-item active">Global View</a> <a
+					class="list-group-item">Global Transfers</a> <a
+					class="list-group-item">Global Transfers History</a> <a
+					class="list-group-item">View Future Transfers</a> <a
+					class="list-group-item">G T Fees Tariff</a> <a
+					class="list-group-item">Add a Country/ Territory</a> <a
+					class="list-group-item">Remove a Country/ Territory</a> <a
+					class="list-group-item">Help</a> <a class="list-group-item">Terms
+					& Conditions</a>
+			</div>
+		</div>
+		<div class="col-md-9">
+
+			<div class="col-md-12 col-sm-9 col-xs-12">
+				<div class="form-nameheader">
+					<hr class="sperate">
+					<div class="col-md-3 col-sm-3 col-xs-3 formicon-top">
+						<span class="cricle redlightbg"> 1 </span>
+					</div>
+					<!-- <div class="col-md-3 col-sm-3 col-xs-3 formicon-top ">
+						<span class="cricle redlightbg"> 2 </span>
+					</div> -->
+					<div class="col-md-3 col-sm-3 col-xs-3 formicon-top">
+						<span class="cricle whitebg"> 2 </span>
+					</div> 
+					<div class="col-md-3 col-sm-3 col-xs-3 formicon-top">
+						<span class="cricle gerybg"> 3 </span>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="col-md-3 col-sm-3 padding hidden-xs text-center">
+					<span class="subtxt"> Transfer Details </span>
+				</div>
+				<div class="col-md-3 col-sm-3 padding  hidden-xs text-center">
+					<span class="subtxt "> Confirm and Submit </span>
+				</div>
+				<!-- <div class="col-md-3 col-sm-3 padding  hidden-xs text-center">
+							<span class="subtxt reddark"> Review details </span>
+					</div> -->
+				<div class="col-md-3 col-sm-3 padding  hidden-xs text-center">
+					<span class="subtxt"> Success </span>
+				</div>
+			</div>
+
+			<div class="col-md-12 col-sm-9 col-xs-12 ">
+				<div ng-app="reviewdetails">
+					<div class="formbg reviewdetails">
+						<form>
+							<div class="form-header">
+								<p>Reviews Details</p>
+							</div>
+							<div class="form-body">
+								<div class="subheader">
+									<h3>
+										Transfer Amount To
+										<!--<span class="edit-btn accto"><a  class="reddark">Edit</a></span>-->
+									</h3>
+									<hr>
+								</div>
+								
+								<div class="clearfix"></div>
+								
+								<div class="col-md-3 col-sm-4 col-xs-12 padding">
+									<label class="">Check</label>
+								</div>
+								<div class="col-md-8 col-sm-8 col-xs-12 padding">
+									<label class="">
+										{{filesend.name}}
+									</label>
+								</div>
+								
+								<div class="clearfix"></div>
+								
+								<div class="col-md-3 col-sm-4 col-xs-12 padding">
+									<label class="">Account Number</label>
+								</div>
+								<div class="col-md-8 col-sm-8 col-xs-12 padding">
+									<!-- <select class="form-control curr-disable" disabled
+										name="accountnumb" id="">
+										<option selected> {{toaccountno}}</option>
+									</select> -->
+									<label class="">
+										{{toaccount.accountNo}}
+									</label>
+								</div>
+														
+								<div class="clearfix"></div>
+								
+								<div class="col-md-3 col-sm-4 col-xs-12 padding">
+									<label class="">Account Type</label>
+								</div>
+								<div class="col-md-8 col-sm-8 col-xs-12 padding">
+									<!-- <select class="form-control curr-disable" disabled
+										name="accountnumb" id="">
+										<option selected> {{toaccountno}}</option>
+									</select> -->
+									<label class="">
+										{{toaccount.accountType}}
+									</label>
+								</div>
+														
+								<div class="clearfix"></div>
+								
+								<div class="col-md-3 col-sm-4 col-xs-12 padding">
+									<label class="">Account Balance</label>
+								</div>
+								<div class="col-md-8 col-sm-8 col-xs-12 padding">
+									<!-- <select class="form-control curr-disable" disabled
+										name="accountnumb" id="">
+										<option selected> {{toaccountno}}</option>
+									</select> -->
+									<label class="">
+										{{toaccount.accountBalance}}
+									</label>
+								</div>
+														
+								<div class="clearfix"></div>
+								
+								<div class="col-md-3 col-sm-4 col-xs-12 padding">
+									<label class="">Branch Code</label>
+								</div>
+								<div class="col-md-8 col-sm-8 col-xs-12 padding">
+									<!-- <select class="form-control curr-disable" disabled
+										name="accountnumb" id="">
+										<option selected> {{toaccountno}}</option>
+									</select> -->
+									<label class="">
+										{{toaccount.branchCode}}
+									</label>
+								</div>
+														
+								<div class="clearfix"></div>
+
+								<div
+									class=" col-md-offset-2 col-sm-offset-2 col-md-10 col-sm-10 col-xs-12 text-center padding16">
+									<button class="btn btn-default redbtn" ng-click="goConfirm()">
+										Submit</button>
+									<!-- <a href="#/confirmdetail" class="btn btn-default redbtn" ng-click="Submit()"> Submit </a> -->
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+$("h3 span").click(function(event){
+   event.preventDefault();
+    var edit = $(this).attr('class').split(' ')[1];
+   $('.'+edit+'-disable').prop("disabled", false); // Element(s) are now enabled.
+});
+</script>

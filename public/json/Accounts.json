@@ -1,0 +1,36 @@
+{
+	"id": "accounts",
+	"body": [{
+		"id": "51aeebafdeb7ade6796aa19e8beac0f9",
+		"accountNo": "2222",
+		"countryCode": "GERMANY",
+		"customerNo": "nextgen",
+		"accountType": "Current",
+		"accountBalance": "-740009.4044695934",
+		"branchCode": "BRANCH002"
+	}, {
+		"id": "78906f5bfb7a3eb52cd3aefef819d14c",
+		"accountNo": "3333",
+		"countryCode": "USA",
+		"customerNo": "nextgen",
+		"accountType": "Current",
+		"accountBalance": "805619.4956853342",
+		"branchCode": "BRANCH003"
+	}, {
+		"id": "9c0f94707ed56c30b989980a502b2403",
+		"accountNo": "4444",
+		"countryCode": "JAPAN",
+		"customerNo": "nextgen",
+		"accountType": "Saving",
+		"accountBalance": "3796129.759224058",
+		"branchCode": "BRANCH004"
+	}, {
+		"id": "d1af8ff2b986356db044ddbfa995f7e5",
+		"accountNo": "1111",
+		"countryCode": "INDIA",
+		"customerNo": "nextgen",
+		"accountType": "Saving",
+		"accountBalance": "3230534.8675649944",
+		"branchCode": "BRANCH001"
+	}]
+}
