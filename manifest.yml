@@ -1,7 +1,7 @@
 declared-services:
   FUNDTRANSFERAPPLICATION-DB:
     label: cloudantNoSQLDB
-    plan: Entry
+    plan: Shared
 applications:
 - path: .
   memory: 512M
