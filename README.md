@@ -1,5 +1,5 @@
 
-[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/suddasgu/WILDemo.git)
+[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)](https://bluemix.net/deploy?repository=https://github.com/suddasgu/FundTransferApp.git)
 
 This README.md file is displayed on your project page. You should edit this 
 file to describe your project, including instructions for building and 
