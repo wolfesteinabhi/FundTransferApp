@@ -245,7 +245,7 @@ bank.controller('reviewdetailcontroller', ['$scope','$http','$resource','$locati
             headers: {'Content-Type': undefined}
 		}).success(function(data) {
 			console.log("Success");
-			transcationId = data.TransactionId;
+			transcationId = data;
 			$location.path('/confirmdetail');
 		}).error(function(error) {
 			//For Testing purpose only

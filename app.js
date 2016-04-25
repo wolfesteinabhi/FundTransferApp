@@ -232,8 +232,8 @@ console.log("createdDoc.rev"+createdDoc.rev);
         });
         busboy.on('finish', function() {
           console.log('Done parsing form!');
-          res.writeHead(303, { Connection: 'close', Location: '/' });
-          res.end();
+          res.writeHead(200, { Connection: 'close'});
+          res.end(createdDoc.id);
         });
        req.pipe(busboy);
 
