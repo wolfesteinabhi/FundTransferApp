@@ -14,8 +14,9 @@
     "morgan": "1.6.x",
     "errorhandler": "1.4.x",
     "connect-multiparty": "2.0.x",
-    "angular": "1.5.0",
-    "busboy":"*"
+    "multer":"1.1.0",
+    "busboy":"0.2.13",
+	"async": "^1.5.0"
   },
   "repository": {},
   "engines": {

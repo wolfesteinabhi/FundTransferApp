@@ -3,15 +3,16 @@
  */
 
 var express = require('express'), routes = require('./routes'), user = require('./routes/user'), http = require('http'), path = require('path'), fs = require('fs');
-
+var fs = require('fs');
 var app = express();
-
+var insertDB 		= require("./dbInsert.js");
 var db;
 
 var cloudant;
-
+var Busboy = require('busboy');
 var fileToUpload;
 
+var async 			= require('async');
 var dbCredentials = {
 	dbName : 'my_sample_db'
 };
@@ -20,8 +21,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var logger = require('morgan');
 var errorHandler = require('errorhandler');
-var multipart = require('connect-multiparty');
-var Busboy = require('busboy');
+var multipart = require('connect-multiparty')
 var multipartMiddleware = multipart();
 
 // all environments
@@ -33,16 +33,32 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
-app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/style', express.static(path.join(__dirname, '/views/style')));
+app.use(function(req, res, next) {
+	  res.header("Access-Control-Allow-Origin", "*");
+	  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+	  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	  next();
+});
 
 // development only
 if ('development' == app.get('env')) {
 	app.use(errorHandler());
 }
-
+var multer  =   require('multer');
+var storage =   multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/uploads/');
+  },
+  filename: function (req, file, callback) {
+    callback(null, file.fieldname + '-' + Date.now());
+  }
+});
+var upload = multer({ storage : storage}).single('userPhoto');
+//var upload = multer({ storage : storage});
 function initDBConnection() {
-	
+
 	if(process.env.VCAP_SERVICES) {
 		var vcapServices = JSON.parse(process.env.VCAP_SERVICES);
 		// Pattern match to find the first instance of a Cloudant service in
@@ -55,14 +71,14 @@ function initDBConnection() {
 				dbCredentials.user = vcapServices[vcapService][0].credentials.username;
 				dbCredentials.password = vcapServices[vcapService][0].credentials.password;
 				dbCredentials.url = vcapServices[vcapService][0].credentials.url;
-				
+
 				cloudant = require('cloudant')(dbCredentials.url);
-				
+
 				// check if DB exists if not create
 				cloudant.db.create(dbCredentials.dbName, function (err, res) {
 					if (err) { console.log('could not create db ', err); }
 				});
-				
+
 				db = cloudant.use(dbCredentials.dbName);
 				break;
 			}
@@ -72,10 +88,10 @@ function initDBConnection() {
 		}
 	} else{
 		console.warn('VCAP_SERVICES environment variable not set - data will be unavailable to the UI');
-		// For running this app locally you can get your Cloudant credentials 
-		// from Bluemix (VCAP_SERVICES in "cf env" output or the Environment 
+		// For running this app locally you can get your Cloudant credentials
+		// from Bluemix (VCAP_SERVICES in "cf env" output or the Environment
 		// Variables section for an app in the Bluemix console dashboard).
-		// Alternately you could point to a local database here instead of a 
+		// Alternately you could point to a local database here instead of a
 		// Bluemix service.
 		//dbCredentials.host = "REPLACE ME";
 		//dbCredentials.port = REPLACE ME;
@@ -87,11 +103,7 @@ function initDBConnection() {
 
 initDBConnection();
 
-//app.get('/', routes.index);
-app.get('/', function(req, res){
-	console.log("Inside Route");
-	res.redirect('/index.html');
-});
+app.get('/', routes.index);
 
 function createResponseData(id, name, value, attachments) {
 
@@ -101,8 +113,8 @@ function createResponseData(id, name, value, attachments) {
 		value : value,
 		attachements : []
 	};
-	
-	 
+
+
 	attachments.forEach (function(item, index) {
 		var attachmentData = {
 			content_type : item.type,
@@ -110,19 +122,166 @@ function createResponseData(id, name, value, attachments) {
 			url : '/api/favorites/attach?id=' + id + '&key=' + item.key
 		};
 		responseData.attachements.push(attachmentData);
-		
+
 	});
 	return responseData;
 }
 
+app.post('/writeFileToCLoudant',function(req,res)
+				{
+
+
+		var busboy = new Busboy({ headers: req.headers });
+
+insertDB.insertInDB(db);
+var createdDoc={};
+	var _inProgress = false;
+
+async.doWhilst(
+			function(callback){
+				if(!_inProgress){
+					_inProgress = true;
+					insertDB.insertInDB(db);
+				}
+				setTimeout(callback, 3000);
+			},
+			function(){
+				return insertDB.createdDoc == null;
+			},
+			function(err){
+				if(!err){
+                      createdDoc=insertDB.createdDoc
+
+
+						console.log("createdDoc   "+JSON.stringify(createdDoc) );
+
+
+busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+       console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+
+
+
+
+
+
+ file.on('data', function(data) {
+
+console.log("inside file.ondata");
+console.log("****************************************");
+
+console.log("FIle object is"+JSON.stringify(file));
+console.log("File name is"+filename);
+console.log("mimetype  is"+mimetype);
+
+db.attachment.insert(createdDoc.id, filename, data, mimetype, {rev: createdDoc.rev}, function(err, document) {
+
+console.log("createdDoc.id"+createdDoc.id);
+console.log("file.name"+file.name);
+console.log("file.type"+file.type);
+console.log("createdDoc.rev"+createdDoc.rev);
+
+							if (!err) {
+								console.log('Attachment saved successfully.. ');
+
+								db.get(document.id, function(err, doc) {
+									console.log('Attachements from server --> ' + JSON.stringify(doc._attachments));
+
+									var attachements = [];
+									var attachData;
+									for(var attachment in doc._attachments) {
+										/*if(attachment == value) {
+											attachData = {"key": attachment, "type": mimetype};
+										} else {
+											attachData = {"key": attachment, "type": doc._attachments[attachment]['content_type']};
+										}*/
+										attachData = {"key": attachment, "type": doc._attachments[attachment]['content_type']};
+										attachements.push(attachData);
+									}
+
+									console.log('Response after attachment: \n'+doc.id);
+									//response.write(JSON.stringify(doc));
+									//response.end();
+									return;
+								});
+							} else {
+								console.log(err);
+							}
+						});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+         });
+
+
+      	file.on('end', function() {
+         console.log('File [' + fieldname + '] Finished');
+
+
+         });
+        });
+        busboy.on('finish', function() {
+          console.log('Done parsing form!');
+          res.writeHead(303, { Connection: 'close', Location: '/' });
+          res.end();
+        });
+       req.pipe(busboy);
+
+				}
+			});
+
+
+
+
+
+
+ });
+
+
+
+
+app.post('/upload', function(req, res) {
+
+ upload(req,res,function(err) {
+        if(err) {
+            return res.end("Error uploading file.");
+        }
+        res.end("File is uploaded");
+    });
+});
+
+
+
+
+
+app.post('/api/photo',function(req,res){
+    upload(req,res,function(err) {
+        if(err) {
+            return res.end("Error uploading file.");
+        }
+
+        res.end("File is uploaded");
+    });
+});
+
 
 var saveDocument = function(id, name, value, response) {
-	
+
 	if(id === undefined) {
 		// Generated random id
 		id = '';
 	}
-	
+
 	db.insert({
 		name : name,
 		value : value
@@ -134,7 +293,7 @@ var saveDocument = function(id, name, value, response) {
 			response.sendStatus(200);
 		response.end();
 	});
-	
+
 }
 
 app.get('/api/favorites/attach', function(request, response) {
@@ -162,22 +321,11 @@ app.post('/api/favorites/attach', multipartMiddleware, function(request, respons
 
 	console.log("Upload File Invoked..");
 	console.log('Request: ' + JSON.stringify(request.headers));
+
 	var id;
-/*	
-	var busboy = new Busboy({ headers: request.headers });
-    busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-      console.log('File [' + fieldname + ']: filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
-      file.on('data', function(data) {
-    	  
-        console.log('File [' + fieldname + '] got ' + data.length + ' bytes');
-      });
-      file.on('end', function() {
-        console.log('File [' + fieldname + '] Finished');
-      });
-    });*/
-	
-	db.get(request.query.id, function(err, existingdoc) {		
-		
+
+	db.get(request.query.id, function(err, existingdoc) {
+
 		var isExistingDoc = false;
 		if (!existingdoc) {
 			id = '-1';
@@ -186,26 +334,26 @@ app.post('/api/favorites/attach', multipartMiddleware, function(request, respons
 			isExistingDoc = true;
 		}
 
-		var name = "XXXX11";
-		var value = "XXXX11";
+		var name = request.query.name;
+		var value = request.query.value;
 
-		var file = request.file;
-		var newPath = './public/uploads/' + file.name;		
-		console.log("New path::"+newPath);
+		var file = request.files.file;
+		var newPath = './public/uploads/' + file.name;
+
 		var insertAttachment = function(file, id, rev, name, value, response) {
-			
+
 			fs.readFile(file.path, function(err, data) {
 				if (!err) {
-				    console.log("checking file load")
+
 					if (file) {
-						  
+
 						db.attachment.insert(id, file.name, data, file.type, {rev: rev}, function(err, document) {
 							if (!err) {
 								console.log('Attachment saved successfully.. ');
-	
-								/*db.get(document.id, function(err, doc) {
+
+								db.get(document.id, function(err, doc) {
 									console.log('Attachements from server --> ' + JSON.stringify(doc._attachments));
-										
+
 									var attachements = [];
 									var attachData;
 									for(var attachment in doc._attachments) {
@@ -225,7 +373,7 @@ app.post('/api/favorites/attach', multipartMiddleware, function(request, respons
 									response.write(JSON.stringify(responseData));
 									response.end();
 									return;
-								});*/
+								});
 							} else {
 								console.log(err);
 							}
@@ -241,7 +389,7 @@ app.post('/api/favorites/attach', multipartMiddleware, function(request, respons
 				value : value,
 				create_date : new Date()
 			};
-			
+
 			// save doc
 			db.insert({
 				name : name,
@@ -250,21 +398,21 @@ app.post('/api/favorites/attach', multipartMiddleware, function(request, respons
 				if(err) {
 					console.log(err);
 				} else {
-					
+
 					existingdoc = doc;
 					console.log("New doc created ..");
 					console.log(existingdoc);
 					insertAttachment(file, existingdoc.id, existingdoc.rev, name, value, response);
-					
+
 				}
 			});
-			
+
 		} else {
 			console.log('Adding attachment to existing doc.');
 			console.log(existingdoc);
 			insertAttachment(file, existingdoc._id, existingdoc._rev, name, value, response);
 		}
-		
+
 	});
 
 });
@@ -274,16 +422,16 @@ app.post('/api/favorites', function(request, response) {
 	console.log("Create Invoked..");
 	console.log("Name: " + request.body.name);
 	console.log("Value: " + request.body.value);
-	
+
 	// var id = request.body.id;
 	var name = request.body.name;
 	var value = request.body.value;
-	
+
 	saveDocument(null, name, value, response);
 
 });
 
-/*app.delete('/api/favorites', function(request, response) {
+app.delete('/api/favorites', function(request, response) {
 
 	console.log("Delete Invoked..");
 	var id = request.query.id;
@@ -291,7 +439,7 @@ app.post('/api/favorites', function(request, response) {
 	// needed, send the rev from client
 	console.log("Removing document of ID: " + id);
 	console.log('Request Query: '+JSON.stringify(request.query));
-	
+
 	db.get(id, { revs_info: true }, function(err, doc) {
 		if (!err) {
 			db.destroy(doc._id, doc._rev, function (err, res) {
@@ -306,18 +454,18 @@ app.post('/api/favorites', function(request, response) {
 		}
 	});
 
-});*/
+});
 
 app.put('/api/favorites', function(request, response) {
 
 	console.log("Update Invoked..");
-	
+
 	var id = request.body.id;
 	var name = request.body.name;
 	var value = request.body.value;
-	
+
 	console.log("ID: " + id);
-	
+
 	db.get(id, { revs_info: true }, function(err, doc) {
 		if (!err) {
 			console.log(doc);
@@ -337,7 +485,7 @@ app.put('/api/favorites', function(request, response) {
 app.get('/api/favorites', function(request, response) {
 
 	console.log("Get method invoked.. ")
-	
+
 	db = cloudant.use(dbCredentials.dbName);
 	var docList = [];
 	var i = 0;
@@ -357,7 +505,7 @@ app.get('/api/favorites', function(request, response) {
 					if(err) {
 						console.log(err);
 					} else {
-						
+
 						console.log('Document : '+JSON.stringify(doc));
 						var responseData = createResponseData(
 							doc.id,
@@ -374,14 +522,14 @@ app.get('/api/favorites', function(request, response) {
 			} else {
 
 				body.rows.forEach(function(document) {
-					
+
 					db.get(document.id, { revs_info: true }, function(err, doc) {
 						if (!err) {
 							if(doc['_attachments']) {
-							
+
 								var attachments = [];
 								for(var attribute in doc['_attachments']){
-								
+
 									if(doc['_attachments'][attribute] && doc['_attachments'][attribute]['content_type']) {
 										attachments.push({"key": attribute, "type": doc['_attachments'][attribute]['content_type']});
 									}
@@ -392,15 +540,15 @@ app.get('/api/favorites', function(request, response) {
 										doc.name,
 										doc.value,
 										attachments);
-							
+
 							} else {
 								var responseData = createResponseData(
 										doc._id,
 										doc.name,
 										doc.value,
 										[]);
-							}	
-						
+							}
+
 							docList.push(responseData);
 							i++;
 							if(i >= len) {
@@ -412,10 +560,10 @@ app.get('/api/favorites', function(request, response) {
 							console.log(err);
 						}
 					});
-					
+
 				});
 			}
-			
+
 		} else {
 			console.log(err);
 		}

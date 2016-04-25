@@ -239,7 +239,8 @@ bank.controller('reviewdetailcontroller', ['$scope','$http','$resource','$locati
 			},
 			data: parsedData*/
 		
-		$http.post("http://fundtransferapplication.mybluemix.net/api/favorites/attach", fd, {
+		//$http.post("http://fundtransferapplication.mybluemix.net/api/favorites/attach", fd, {
+		$http.post("/writeFileToCloudant", fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
 		}).success(function(data) {
